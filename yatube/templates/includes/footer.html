@@ -1,0 +1,18 @@
+<footer>
+  {% load static %}
+  <nav class="navbar" style="background-color: DarkOrange">
+    <div class="container-fluid">
+      <ul class="nav nav-pills ml-auto">
+        {% with request.resolver_match.view_name as view_name %}
+        <li class="nav-item">
+          <a class="nav-link {% if view_name  == 'about:author' %}active{% endif %}" href="{% url 'about:author' %}">О
+            проекте</a>
+        </li>
+      {% endwith %}
+  </div>
+  <div class="mx-auto" style="width: 200px;">
+  <a class="text-white"> © {{ year }}
+   Anime Words
+  </a>
+</div>
+</footer>

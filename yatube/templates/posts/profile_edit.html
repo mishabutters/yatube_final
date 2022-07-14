@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Редактировать профиль{% endblock %}
+{% block content %}
+{% load user_filters %}
+  <div class="row justify-content-center">
+    <div class="col-md-8 p-5">
+      <div class="card">
+        <div class="card-header">Редактироваеие профиля</div>
+        <div class="card-body">
+          <form method="post" enctype="multipart/form-data"
+            {% if action_url %}
+              action="{% url action_url %}"
+            {% endif %}
+          >
+            {% include 'includes/form_base.html' with form=user_form %}
+            {% include 'includes/form_base.html' with form=profile_form %}
+            <div class="col-md-6 offset-md-4">
+              <button type="submit" class="btn btn-primary">
+                Изменить
+              </button>
+
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+</div>
+{% endblock %}
