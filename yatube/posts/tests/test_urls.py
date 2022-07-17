@@ -2,6 +2,7 @@ from http import HTTPStatus
 from urllib.parse import urljoin
 
 from django.contrib.auth import get_user_model
+from django.core.cache import cache
 from django.test import Client, TestCase
 from django.urls import reverse
 
@@ -30,6 +31,7 @@ class TaskURLTests(TestCase):
         )
 
     def setUp(self):
+        cache.clear()
         self.guest_client = Client()
         self.authorized_client_owner = Client()
         self.authorized_client_owner.force_login(self.user_owner)

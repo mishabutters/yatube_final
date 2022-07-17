@@ -23,7 +23,7 @@ class PostTests(TestCase):
         cls.user = User.objects.create_user(username='test_name')
 
         cls.group = Group.objects.create(
-            title='Заголовок для тестовой группы',
+            title='Заголовок для тестовой груп пы',
             slug='test_slug'
         )
         settings.MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
@@ -46,18 +46,6 @@ class PostTests(TestCase):
             group=cls.group,
             image=uploaded,
         )
-        cls.templates_page_names = [
-            (reverse('posts:index'), 'posts/index.html'),
-            (reverse('posts:post_create'), 'posts/create_post.html'),
-            (reverse('posts:group_list', kwargs={'slug': 'test_slug'}),
-                'posts/group_list.html'),
-            (reverse('posts:profile', kwargs={'username': 'test_name'}),
-                'posts/profile.html'),
-            (reverse('posts:post_detail', kwargs={'post_id': '1'}),
-                'posts/post_detail.html'),
-            (reverse('posts:post_edit', kwargs={'post_id': '1'}),
-                'posts/create_post.html'),
-        ]
 
     @classmethod
     def tearDownClass(cls):
@@ -65,14 +53,28 @@ class PostTests(TestCase):
         super().tearDownClass()
 
     def setUp(self):
+        cache.clear()
         self.guest_client = Client()
         self.user = PostTests.post.author
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
 
     def test_pages_uses_correct_template(self):
-        """URL-адрес использует правильный шаблон."""
-        for reverse_name, template in PostTests.templates_page_names:
+        """URL-адрес использует соответствующий шаблон."""
+        templates_page_names = {
+            reverse('posts:index'): 'posts/index.html',
+            reverse('posts:post_create'): 'posts/create_post.html',
+            reverse('posts:group_list', kwargs={'slug': 'test_slug'}):
+                'posts/group_list.html',
+            reverse('posts:profile', kwargs={'username': 'test_name'}):
+                'posts/profile.html',
+            reverse('posts:post_detail', kwargs={'post_id': '1'}):
+                'posts/post_detail.html',
+            reverse('posts:post_edit', kwargs={'post_id': '1'}):
+                'posts/create_post.html',
+        }
+
+        for reverse_name, template in templates_page_names.items():
             with self.subTest(template=template):
                 response = self.authorized_client.get(reverse_name)
                 self.assertTemplateUsed(response, template)
@@ -164,6 +166,7 @@ class PaginatorViewsTest(TestCase):
         }
 
     def setUp(self):
+        cache.clear()
         self.guest_client = Client()
         self.user = User.objects.create_user(username='NoName')
         self.authorized_client = Client()
@@ -187,6 +190,7 @@ class PaginatorViewsTest(TestCase):
 
 class FollowTests(TestCase):
     def setUp(self):
+        cache.clear()
         self.user_follower = Client()
         self.author_following = Client()
         self.user_1 = User.objects.create_user(username='follower')
@@ -243,6 +247,7 @@ class CacheTests(TestCase):
             text='Тестовая запись для создания поста')
 
     def setUp(self):
+        cache.clear()
         self.guest_client = Client()
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)

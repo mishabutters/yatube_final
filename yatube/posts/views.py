@@ -2,6 +2,7 @@ import logging
 
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.cache import cache_page
 
 from users.forms import ProfileForm, UpdateUserForm
 
@@ -10,6 +11,7 @@ from .models import Follow, Group, Post, User
 from .utils import paginator
 
 
+@cache_page(20, key_prefix='index_page')
 def index(request):
     post_list = Post.objects.select_related('group', 'author').all()
     page_obj = paginator(request, post_list)
@@ -72,8 +74,9 @@ def profile_edit(request, username):
 
 
 def post_detail(request, post_id):
+    template = 'posts/post_detail.html'
     post = get_object_or_404(Post, pk=post_id)
-    posts_count = Post.objects.filter(author=post.author).count()
+    posts_count = Post.objects.select_related('following').count()
     form = CommentForm(request.POST or None)
     comments = post.comments.all()
     context = {
@@ -83,7 +86,7 @@ def post_detail(request, post_id):
         'form': form,
         'comments': comments,
     }
-    return render(request, 'posts/post_detail.html', context=context)
+    return render(request, template, context=context)
 
 
 @login_required
